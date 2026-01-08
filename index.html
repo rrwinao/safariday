@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safari Day with Love</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif}
+
+body{
+  height:100vh;
+  background:
+    radial-gradient(circle at top left, #fff1c1 0%, transparent 40%),
+    radial-gradient(circle at bottom right, #ffd6e8 0%, transparent 45%),
+    linear-gradient(135deg, #5f9cff, #8fd3f4, #a1ffce);
+  animation:bg 20s ease infinite;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition:background 2.5s ease;
+}
+
+body.night{
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.12), transparent 35%),
+    radial-gradient(circle at 80% 30%, rgba(167,139,250,.25), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(56,189,248,.2), transparent 45%),
+    linear-gradient(135deg, #020617, #1e1b4b, #312e81);
+}
+
+body.fade-black::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:black;
+  opacity:0;
+  animation:fadeBlack 3s forwards;
+  z-index:20;
+}
+
+.card{
+  background:rgba(255,255,255,0.88);
+  backdrop-filter:blur(10px);
+  padding:38px;
+  border-radius:32px;
+  max-width:400px;
+  text-align:center;
+  box-shadow:0 25px 60px rgba(0,0,0,.15);
+  z-index:2;
+  transition:transform 2.5s ease, opacity 2.5s ease;
+}
+.card.up{
+  transform:translateY(-120px);
+  opacity:0;
+}
+
+h1{font-size:2.3em;margin-bottom:14px;color:#ff6fae}
+p{line-height:1.7;color:#334155}
+
+button{
+  margin-top:24px;
+  padding:13px 36px;
+  border:none;
+  border-radius:999px;
+  background:linear-gradient(135deg,#ff8fc7,#ffd56b);
+  font-weight:700;
+  cursor:pointer;
+  transition:.3s;
+}
+button:hover{transform:scale(1.05)}
+
+.popup{
+  position:absolute;
+  background:white;
+  color:#1f2937;
+  padding:12px 18px;
+  border-radius:18px;
+  font-weight:600;
+  font-size:.9em;
+  white-space:pre-line;
+  animation:popup 2.8s forwards;
+  z-index:3;
+}
+
+.emoji{
+  position:absolute;
+  animation:float linear forwards;
+  pointer-events:none;
+}
+
+.goodnight{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:100%;
+  text-align:center;
+  color:#e5e7eb;
+  font-size:1.15em;
+  opacity:0;
+  animation:fadeIn 3s forwards;
+  z-index:10;
+  line-height:1.8;
+}
+
+
+.star{
+  position:fixed;
+  background:white;
+  border-radius:50%;
+  opacity:.6;
+  animation:twinkle 4s infinite ease-in-out;
+}
+
+/* ubah .controls saja */
+.controls{
+  position:fixed;
+  bottom:calc(50% - 120px); /* naik mendekati card, bukan terlalu bawah */
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  opacity:0;
+  pointer-events:none;
+  transition:.6s ease;
+  z-index:12;
+}
+
+.controls.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.ctrl-btn{
+  padding:9px 22px;
+  border-radius:999px;
+  border:none;
+  background:rgba(255,255,255,.85);
+  font-size:.82em;
+  font-weight:600;
+  cursor:pointer;
+  transition:.25s;
+}
+.ctrl-btn:hover{transform:scale(1.05)}
+
+@keyframes bg{
+  0%{filter:hue-rotate(0)}
+  50%{filter:hue-rotate(10deg)}
+  100%{filter:hue-rotate(0)}
+}
+@keyframes float{
+  from{transform:translateY(110vh);opacity:1}
+  to{transform:translateY(-25vh);opacity:0}
+}
+@keyframes popup{
+  0%{opacity:0}
+  15%{opacity:1}
+  85%{opacity:1;transform:translate(-50%,-70px)}
+  100%{opacity:0;transform:translate(-50%,-90px)}
+}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes twinkle{
+  0%,100%{opacity:.2}
+  50%{opacity:.8}
+}
+@keyframes fadeBlack{to{opacity:1}}
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+  <h1>Hi Reno🦁💖</h1>
+  <p>
+    Today is your Safari Day!  
+    <br>Enjoy every moment, see cute animals,  
+    laugh a lot, and don’t forget… 
+   <br> someone here loves you sooo muchh💗</br>
+  </p>
+  <button onclick="startSafari()">Start Megical World💌</button>
+</div>
+
+<div class="controls" id="controls">
+  <button class="ctrl-btn" onclick="location.reload()">↺ Replay</button>
+  <button class="ctrl-btn" onclick="nightMode()">Night mode 🌙</button>
+</div>
+
+<audio id="pop" src="pop.mp3" preload="auto"></audio>
+<audio id="finalSound" src="final.mp3" preload="auto"></audio>
+
+<script>
+const pop=document.getElementById("pop");
+const finalSound=document.getElementById("finalSound");
+const controls=document.getElementById("controls");
+const card=document.getElementById("card");
+
+pop.volume=.25;
+finalSound.volume=.4;
+
+document.body.addEventListener("click",()=>{
+  [pop,finalSound].forEach(s=>{
+    s.play().then(()=>{s.pause();s.currentTime=0}).catch(()=>{})
+  });
+},{once:true});
+
+function startSafari(){
+  pop.currentTime = 0;
+  pop.play();
+
+  const emojis = ["🌿","🍃","✨","🤍","🦁", "🐘"];
+  const total = 6; // lebih calm
+
+  for(let i = 0; i < total; i++){
+    const e = document.createElement("div");
+    e.className = "emoji";
+    e.innerHTML = emojis[Math.floor(Math.random()*emojis.length)];
+
+    e.style.left = (10 + Math.random()*80) + "vw";
+    e.style.fontSize = (16 + Math.random()*6) + "px";
+    e.style.animationDuration = (7 + Math.random()*4) + "s";
+    e.style.opacity = .6;
+
+    document.body.appendChild(e);
+    setTimeout(()=>e.remove(),10000);
+  }
+}
+
+const messages=[
+  "Good mowningg woopss ☀️💖",
+  "Yeayy!, Safari Day is finally here✨",
+  "i'am soo excited for youu 🙌🏻",
+  "Hati-hatii di jalan lovee 🚗✨",
+  "Take care of ur self bb!!💖",
+  "Enjoy your day at Taman Safari 🦒💖",
+  "Hope today brings lots of smiles & good energy 🫶✨",
+  "Have fun seeing cute animals 🐒",
+  "Don’t rush bb, enjoy every moment!",
+  "Aku doain perjalananmu lancar 🤍",
+  "Remember, I’m cheering for you 💕",
+  "Take lots of pictures yaaa 📸😋",
+  "Love you always, yenoo anandaa!!😚💗",
+  "bigg hugg n kiccy for uu🤭💖",
+  "Have the happiest safari day 🦁✨",
+  "Smile as much as the animals today 🐵💛",
+  "Take a moment to eat and stay hydrated 🤍",
+  "Aku nunggu cerita kamu nanti😉💖"
+];
+
+let i=0, finalPlayed=false;
+
+document.addEventListener("click",e=>{
+  if(i<messages.length){
+    pop.currentTime=0; pop.play();
+    const p=document.createElement("div");
+    p.className="popup";
+    p.innerText=messages[i];
+    p.style.left=e.clientX+"px";
+    p.style.top=e.clientY+"px";
+    document.body.appendChild(p);
+    i++;
+    setTimeout(()=>p.remove(),2800);
+  }else{
+    finalMessage();
+  }
+});
+
+function finalMessage(){
+  if(finalPlayed) return;
+  finalPlayed=true;
+
+  const p=document.createElement("div");
+  p.className="popup";
+  p.innerText=
+`No matter how far you go today…
+I’m always with you 🤍
+
+Have the happiest Safari Day Babe!!🤍
+I love you, always.
+
+— from your girl 💌`;
+  p.style.left="50%";
+  p.style.top="50%";
+  p.style.transform="translate(-50%,-50%)";
+  document.body.appendChild(p);
+
+  finalSound.play();
+  setTimeout(()=>controls.classList.add("show"),2000);
+}
+
+function nightMode(){
+  card.classList.add("up");
+  document.body.classList.add("night");
+  createStars();
+
+  setTimeout(()=>{
+    const g=document.createElement("div");
+    g.className="goodnight";
+    g.innerText=
+`Good night 🤍🌙
+
+Rest well and let today’s memories settle gently.
+You’ve done enough for today, Tomorrow will be another beautiful day!`;
+    document.body.appendChild(g);
+  },1800);
+
+  setTimeout(()=>{
+    document.body.classList.add("fade-black");
+  },6800);
+}
+
+function createStars(){
+  for(let i=0;i<32;i++){
+    const s=document.createElement("div");
+    s.className="star";
+    const size=Math.random()*2+1;
+    s.style.width=size+"px";
+    s.style.height=size+"px";
+    s.style.left=Math.random()*100+"vw";
+    s.style.top=Math.random()*100+"vh";
+    document.body.appendChild(s);
+  }
+}
+</script>
+
+</body>
+</html>
